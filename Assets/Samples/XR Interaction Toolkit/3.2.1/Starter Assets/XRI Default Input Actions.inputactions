@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "XRI Default Input Actions",
     "maps": [
         {
@@ -3395,6 +3396,62 @@
                     "action": "Spawn Object",
                     "isComposite": false,
                     "isPartOfComposite": true
+                }
+            ]
+        },
+        {
+            "name": "SwitchRight",
+            "id": "bf1c0ccb-caf6-4f8e-9ad4-dafc624b78aa",
+            "actions": [
+                {
+                    "name": "SwitchRight",
+                    "type": "Button",
+                    "id": "cbe92cfd-4e61-44fb-bd87-fe3df613f398",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8c840f89-fe32-437b-bbe6-7d79f5329d79",
+                    "path": "<XRController>{RightHand}/secondaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "SwitchLeft",
+            "id": "7b07f5f2-6a19-458f-bb60-8439e8de6250",
+            "actions": [
+                {
+                    "name": "SwitchLeft",
+                    "type": "Button",
+                    "id": "0b7c4f05-d44d-431c-a044-500acc67b6ee",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6d61da54-92e2-4bd0-bfbf-4e991f36c75d",
+                    "path": "<XRController>{LeftHand}/secondaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
