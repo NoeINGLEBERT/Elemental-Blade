@@ -10,15 +10,27 @@ public class WaveManager : MonoBehaviour
     public bool autoStartFirstWave = true;
     public float delayBeforeNextWave = 3f;
     
-    [Header("Spawn Settings")]
+    [Header("Spawn Center")]
+    public SpawnCenterMode centerMode = SpawnCenterMode.Player;
     public Transform player;
-    public float spawnDistance = 10f;
-    public float spawnHeight = 1f;
+    public Transform customSpawnCenter;
+    public Vector3 fixedSpawnCenter = Vector3.zero;
     public bool autoFindPlayer = true;
     
-    [Header("Spawn Area")]
-    public Vector2 spawnAreaMin = new Vector2(-15f, -15f);
-    public Vector2 spawnAreaMax = new Vector2(15f, 15f);
+    [Header("Spawn Settings")]
+    public float spawnHeight = 1f;
+    
+    [Header("Circular Spawn Area")]
+    public float minSpawnRadius = 10f;
+    public float maxSpawnRadius = 15f;
+    
+    public enum SpawnCenterMode
+    {
+        Player,
+        CustomTransform,
+        FixedPosition,
+        WaveManagerPosition
+    }
     
     private List<GameObject> activeEnemies = new List<GameObject>();
     private bool isSpawning = false;
@@ -119,7 +131,7 @@ public class WaveManager : MonoBehaviour
     
     private void SpawnEnemy(GameObject enemyPrefab)
     {
-        if (enemyPrefab == null || player == null)
+        if (enemyPrefab == null)
         {
             return;
         }
@@ -129,16 +141,38 @@ public class WaveManager : MonoBehaviour
         activeEnemies.Add(enemy);
     }
     
+    private Vector3 GetSpawnCenter()
+    {
+        switch (centerMode)
+        {
+            case SpawnCenterMode.Player:
+                return player != null ? player.position : Vector3.zero;
+            
+            case SpawnCenterMode.CustomTransform:
+                return customSpawnCenter != null ? customSpawnCenter.position : Vector3.zero;
+            
+            case SpawnCenterMode.FixedPosition:
+                return fixedSpawnCenter;
+            
+            case SpawnCenterMode.WaveManagerPosition:
+                return transform.position;
+            
+            default:
+                return Vector3.zero;
+        }
+    }
+    
     private Vector3 GetRandomSpawnPosition()
     {
-        Vector3 playerPos = player.position;
+        Vector3 centerPos = GetSpawnCenter();
         
-        float randomX = Random.Range(spawnAreaMin.x, spawnAreaMax.x);
-        float randomZ = Random.Range(spawnAreaMin.y, spawnAreaMax.y);
+        float randomAngle = Random.Range(0f, 360f);
+        float randomRadius = Random.Range(minSpawnRadius, maxSpawnRadius);
         
-        Vector3 offset = new Vector3(randomX, 0f, randomZ);
-        Vector3 spawnPos = playerPos + offset;
-        spawnPos.y = playerPos.y + spawnHeight;
+        float x = Mathf.Cos(randomAngle * Mathf.Deg2Rad) * randomRadius;
+        float z = Mathf.Sin(randomAngle * Mathf.Deg2Rad) * randomRadius;
+        
+        Vector3 spawnPos = centerPos + new Vector3(x, spawnHeight, z);
         
         return spawnPos;
     }
@@ -160,20 +194,29 @@ public class WaveManager : MonoBehaviour
     
     private void OnDrawGizmosSelected()
     {
-        if (player == null)
+        Vector3 centerPos = GetSpawnCenter();
+        
+        Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+        DrawCircle(centerPos, maxSpawnRadius, 64);
+        
+        Gizmos.color = new Color(1f, 0.5f, 0f, 0.3f);
+        DrawCircle(centerPos, minSpawnRadius, 64);
+        
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(centerPos, 0.5f);
+    }
+    
+    private void DrawCircle(Vector3 center, float radius, int segments)
+    {
+        float angleStep = 360f / segments;
+        Vector3 prevPoint = center + new Vector3(radius, 0f, 0f);
+        
+        for (int i = 1; i <= segments; i++)
         {
-            return;
+            float angle = i * angleStep * Mathf.Deg2Rad;
+            Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
+            Gizmos.DrawLine(prevPoint, newPoint);
+            prevPoint = newPoint;
         }
-        
-        Vector3 playerPos = player.position;
-        
-        Gizmos.color = Color.yellow;
-        Vector3 min = new Vector3(playerPos.x + spawnAreaMin.x, playerPos.y, playerPos.z + spawnAreaMin.y);
-        Vector3 max = new Vector3(playerPos.x + spawnAreaMax.x, playerPos.y, playerPos.z + spawnAreaMax.y);
-        
-        Vector3 size = max - min;
-        Vector3 center = min + size * 0.5f;
-        
-        Gizmos.DrawWireCube(center, new Vector3(size.x, 0.1f, size.z));
     }
 }
