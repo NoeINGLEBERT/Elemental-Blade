@@ -161,6 +161,10 @@ MonoBehaviour:
   spawnHeight: 1
   minSpawnRadius: 10
   maxSpawnRadius: 15
+  elementTags:
+  - Fire
+  - Water
+  - Ice
 --- !u!4 &40481278
 Transform:
   m_ObjectHideFlags: 0
