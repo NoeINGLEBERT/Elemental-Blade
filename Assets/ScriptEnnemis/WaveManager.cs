@@ -24,6 +24,9 @@ public class WaveManager : MonoBehaviour
     public float minSpawnRadius = 10f;
     public float maxSpawnRadius = 15f;
     
+    [Header("Element Tags")]
+    public string[] elementTags = new string[] { "Feu", "Eau", "Glace" };
+    
     public enum SpawnCenterMode
     {
         Player,
@@ -135,9 +138,18 @@ public class WaveManager : MonoBehaviour
         {
             return;
         }
-        
+
         Vector3 spawnPosition = GetRandomSpawnPosition();
         GameObject enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+
+        // Choisir un tag élémentaire aléatoire
+        if (elementTags.Length > 0)
+        {
+            string randomTag = elementTags[Random.Range(0, elementTags.Length)];
+            enemy.tag = randomTag;
+            Debug.Log($"Spawned {enemy.name} with tag: {randomTag}");
+        }
+
         activeEnemies.Add(enemy);
     }
     
