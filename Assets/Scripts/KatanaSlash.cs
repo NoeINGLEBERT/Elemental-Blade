@@ -28,6 +28,15 @@ public class KatanaSlash : MonoBehaviour
 
     private Vector3 lastTipPos;
 
+    [Header("Element Audio")]
+    public AudioClip fireSlashWhoosh;
+    public AudioClip iceSlashWhoosh;
+    public AudioClip waterSlashWhoosh;
+
+    public AudioClip fireSwitchSound;
+    public AudioClip iceSwitchSound;
+    public AudioClip waterSwitchSound;
+
     private void OnEnable()
     {
         if (elementSwitchAction != null)
@@ -66,6 +75,32 @@ public class KatanaSlash : MonoBehaviour
     private void OnElementSwitch(InputAction.CallbackContext ctx)
     {
         currentElement = GetNextElement(currentElement);
+
+        // --- Play element switch sound ---
+        AudioClip switchClip = null;
+
+        switch (currentElement)
+        {
+            case ElementType.Fire:
+                switchClip = fireSwitchSound;
+                break;
+
+            case ElementType.Ice:
+                switchClip = iceSwitchSound;
+                break;
+
+            case ElementType.Water:
+                switchClip = waterSwitchSound;
+                break;
+        }
+
+        if (slashSound && switchClip != null)
+        {
+            slashSound.volume = 1f;
+            slashSound.PlayOneShot(switchClip);
+        }
+
+
         if (debugLogs)
             Debug.Log($"[KatanaSlash] Switched to {currentElement}");
     }
@@ -103,8 +138,28 @@ public class KatanaSlash : MonoBehaviour
         scale.y = Vector3.Distance(startTip, endTip);
         go.transform.localScale = scale;
 
-        if (slashSound && !slashSound.isPlaying)
-            slashSound.Play();
+        // --- Pick correct whoosh sound ---
+        AudioClip whoosh = null;
+
+        switch (currentElement)
+        {
+            case ElementType.Fire:
+                whoosh = fireSlashWhoosh;
+                break;
+            case ElementType.Ice:
+                whoosh = iceSlashWhoosh;
+                break;
+            case ElementType.Water:
+                whoosh = waterSlashWhoosh;
+                break;
+        }
+
+        if (slashSound && whoosh != null)
+        {
+            slashSound.volume = 0.125f;
+            slashSound.PlayOneShot(whoosh);
+        }
+
 
         Destroy(go, lifetime);
 
